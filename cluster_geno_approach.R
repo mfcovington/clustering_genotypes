@@ -30,30 +30,28 @@ blk.11 <- calc.score(blk.11)
 blk.12 <- read.tables(c(list.files(pattern = "RIL_1.12.")))
 blk.12 <- calc.score(blk.12)
 
-
-merged <- merge(blk.03, blk.04, by = "pos")
+merged <- merge(blk.03, blk.04, by = c("pos", "chr"), all = TRUE)
 cor(merged$score.x, merged$score.y, use = "pairwise.complete.obs")
-# [1] 0.01005245
+# [1] 0.009969097
 
-merged <- merge(blk.03, blk.11, by = "pos")
+merged <- merge(blk.03, blk.11, by = c("pos", "chr"), all = TRUE)
 cor(merged$score.x, merged$score.y, use = "pairwise.complete.obs")
-# [1] 0.007064372
+# [1] 0.007874977
 
-merged <- merge(blk.03, blk.12, by = "pos")
+merged <- merge(blk.03, blk.12, by = c("pos", "chr"), all = TRUE)
 cor(merged$score.x, merged$score.y, use = "pairwise.complete.obs")
-# [1] 0.005213639
+# [1] 0.005195858
 
-merged <- merge(blk.04, blk.11, by = "pos")
+merged <- merge(blk.04, blk.11, by = c("pos", "chr"), all = TRUE)
 cor(merged$score.x, merged$score.y, use = "pairwise.complete.obs")
-# [1] 0.9641753
+# [1] 0.9670474
 
-merged <- merge(blk.04, blk.12, by = "pos")
+merged <- merge(blk.04, blk.12, by = c("pos", "chr"), all = TRUE)
 cor(merged$score.x, merged$score.y, use = "pairwise.complete.obs")
-# [1] 0.9819545
+# [1] 0.9849189
 
-merged <- merge(blk.11, blk.12, by = "pos")
+merged <- merge(blk.11, blk.12, by = c("pos", "chr"), all = TRUE)
 cor(merged$score.x, merged$score.y, use = "pairwise.complete.obs")
-# [1] 0.9659468
-
+# [1] 0.9681997
 
 
