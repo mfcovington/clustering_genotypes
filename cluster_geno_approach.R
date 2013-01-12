@@ -1,15 +1,19 @@
-# read files, do calcs, and name columns
-
 setwd("/Users/mfc/git.repos/clustering_genotypes/samples/genotyped/")
 
-# function to read multiple files at once adapted from:
-# http://stackoverflow.com/questions/2104483/how-to-read-table-multiple-files-into-a-single-table-in-r/2104532#2104532
 ReadMultiTables <- function(file.names, ...) {
+    # function to read multiple files at once
+    # adapted from: http://stackoverflow.com/questions/2104483/how-to-read-table-multiple-files-into-a-single-table-in-r/2104532#2104532
+
     require(plyr)
     ldply(file.names, function(fn) data.frame(Filename=fn, read.table(fn, ...)))
 }
 
 CalcScore <- function(sample.df) {
+    # function to calculate genotype scores
+    # par1 ==  1
+    # het  ==  0
+    # par2 == -1
+
     colnames(sample.df) <- c("filename", "chr", "pos", "par1", "par2", "tot")
     sample.df <- cbind(sample.df, (sample.df$par2 - sample.df$par1) / sample.df$tot)
     colnames(sample.df)[7] <- "ratio"
@@ -22,6 +26,8 @@ CalcScore <- function(sample.df) {
 }
 
 GenoCor <- function(files) {
+    # function to generate a correlation matrix for
+    # genotype data from multiple samples
 
     # filter out empty files
     files <- files[file.info(files)$size > 0]
@@ -51,8 +57,9 @@ GenoCor <- function(files) {
 }
 
 CorPval <- function(x, alternative="two-sided", ...) {
-
+    # function to calculate p-values from correlation matrix
     # from: http://tolstoy.newcastle.edu.au/R/help/05/04/2659.html
+
     corMat <- cor(x, ...)
     n <- nrow(x)
     df <- n - 2
@@ -69,8 +76,9 @@ CorPval <- function(x, alternative="two-sided", ...) {
 }
 
 CorPlot <- function(cor.mat) {
-
+    # function to plot correlation matrix
     # adapted from: http://theatavism.blogspot.com/2009/05/plotting-correlation-matrix-with.html
+
     library("ggplot2")
     cor.pval <- CorPval(cor.mat)
     stars <- as.character(
