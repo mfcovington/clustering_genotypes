@@ -52,3 +52,56 @@ GenoCor <- function(files) {
 
 files <- list.files(pattern = "\\.genotyped\\.nr$")
 genocor.mat <- GenoCor(files)
+genocor.df <- melt(genocor.mat)
+
+library("ggplot2")
+
+cor.pval <- function(x, alternative="two-sided", ...) {
+
+    # from: http://tolstoy.newcastle.edu.au/R/help/05/04/2659.html
+    corMat <- cor(x, ...)
+    n <- nrow(x)
+    df <- n - 2
+    STATISTIC <- sqrt(df) * corMat / sqrt(1 - corMat^2)
+    p <- pt(STATISTIC, df)
+    p <- if (alternative == "less") {
+        p
+    }
+    else if (alternative == "greater") {
+        1 - p
+    }
+    else 2 * pmin(p, 1 - p)
+    p
+}
+
+
+genocor.pval <- cor.pval(genocor.mat)
+stars <- as.character(
+    symnum(genocor.pval,
+        cutpoints = c( 0,      0.001,   0.01,    0.05,  1),
+        symbols   = c(   '***',    '**',     '*',     '' ), legend = FALSE))
+
+genocor.df <- cbind(melt(genocor.mat), stars)
+names(genocor.df) <- c("id.a", "id.b", "cor.val", "p.sig")
+
+self <- subset(genocor.df, id.a == id.b)
+lower <- subset(genocor.df[lower.tri(genocor.mat),], id.a != id.b)
+upper <- subset(genocor.df[upper.tri(genocor.mat),], id.a != id.b)
+genocor.plot <- ggplot(genocor.df, aes(id.a, id.b, fill = cor.val))
+genocor.plot + geom_tile()
+
+sample.order <- as.character(unique(genocor.df$id.b))
+
+genocor.plot <- ggplot(upper, aes(id.a, id.b, fill = cor.val))
+genocor.plot +
+  geom_tile() +
+  geom_text(aes(label=p.sig), color = "green") +
+  # geom_text(aes(label=X2)) +
+  # scale_colour_identity() +
+  theme(axis.text.x = element_text(angle = 270, hjust = 0)) +
+  scale_fill_gradientn(colours= c("red", "white", "blue"), limits=c(-1,1)) +
+  scale_x_discrete(limits=sample.order[1:length(sample.order) - 1]) +
+  scale_y_discrete(limits=sample.order[length(sample.order):2]) +
+  labs(x = '', y = '')
+
+
