@@ -21,21 +21,22 @@ calc.score <- function(sample.df) {
     return(sample.df)
 }
 
+GenoCor <- function(files) {
+    files <- files[file.info(files)$size > 0]
+    ids <- unique(gsub(pattern = "(.*)\\.[^.]+\\.genotyped.*", replacement = "\\1", files))
 
-files <- list.files(pattern = "\\.genotyped\\.nr$")
-files <- files[file.info(files)$size > 0]
-ids <- unique(gsub(pattern = "(.*)\\.[^.]+\\.genotyped.*", replacement = "\\1", files))
+    merged <- data.frame(chr = NA, pos = NA)
+    for (id in ids) {
+        print(id)
+        data <- read.tables(c(list.files(pattern = id)))
+        data <- calc.score(data)
+        merged <- merge(merged, data[, c(2, 3, 8)], by = c("pos", "chr"), all = TRUE)
+        colnames(merged)[ncol(merged)] <- id
+    }
 
-merged <- data.frame(chr = NA, pos = NA)
-
-for (id in ids) {
-    print(id)
-    data <- read.tables(c(list.files(pattern = id)))
-    data <- calc.score(data)
-    merged <- merge(merged, data[, c(2, 3, 8)], by = c("pos", "chr"), all = TRUE)
-    colnames(merged)[ncol(merged)] <- id
+    genocor.mat <- cor(merged[, 3:ncol(merged)], use = "pairwise.complete.obs")
+    return(genocor.mat)
 }
 
-cor(merged[, 3:ncol(merged)], use = "pairwise.complete.obs")
-
-
+files <- list.files(pattern = "\\.genotyped\\.nr$")
+genocor.mat <- GenoCor(files)
