@@ -54,4 +54,79 @@ merged <- merge(blk.11, blk.12, by = c("pos", "chr"), all = TRUE)
 cor(merged$score.x, merged$score.y, use = "pairwise.complete.obs")
 # [1] 0.9681997
 
+merged <- merge(
+    blk.11[, c(2, 3, 8)],
+    blk.12[, c(2, 3, 8)],
+    by = c("pos", "chr"),
+    all = TRUE,
+    suffix = c("a", "b")
+)
+
+
+
+library("reshape")
+
+
+df1 <- data.frame(x=rnorm(1000), y=rnorm(1000), z=factor(letters[2:5]))
+
+ldf <- lapply(seq(1, 100), function(.) df1)
+
+merge.rec <- function(.list, ...){
+    if(length(.list)==1) return(.list[[1]])
+    Recall(c(list(merge(.list[[1]], .list[[2]], ...)), .list[-(1:2)]), ...)
+}
+
+system.time(Reduce(function(x, y) merge(x, y, all=T), ldf, accumulate=F))
+system.time(merge_all(ldf))
+system.time(merge.rec(ldf, all=T))
+
+list.df <- lapply()
+
+
+all.files <- list.files(pattern = "RIL_.*\\.genotyped\\.nr$")
+ril.ids <- unique(gsub(pattern = "^([^.]+)\\..*", replacement = "\\1", all.files))
+
+for (ril in ril.ids) {
+    print(ril)
+}
+
+ril.files <- list.files(pattern = paste(ril.ids, "\\.genotyped\\.nr$", sep = '')
+block.ids <- unique(gsub(pattern = "^[^.]+\\.([^.]+)\\..*", replacement = "\\1", all.files))
+
+
+
+
+# from here
+
+files <- list.files(pattern = "\\.genotyped\\.nr$")
+files <- files[file.info(files)$size > 0]
+ids <- unique(gsub(pattern = "(.*)\\.[^.]+\\.genotyped.*", replacement = "\\1", files))
+
+merged <- data.frame(chr = NA, pos = NA)
+
+for (id in ids) {
+    print(id)
+    data <- read.tables(c(list.files(pattern = id)))
+    data <- calc.score(data)
+    merged <- merge(merged, data[, c(2, 3, 8)], by = c("pos", "chr"), all = TRUE)
+    colnames(merged)[ncol(merged)] <- id
+}
+
+cor(merged[, 3:ncol(merged)], use = "pairwise.complete.obs")
+
+# to here looks good
+
+
+
+df.list <- vector("list", 3) # create list
+
+for(i in 1:3) {
+    df.list[[i]] <- matrix(data = rnorm(3),
+                                     nrow = i,
+                                     ncol = 3,
+                                     byrow = FALSE,
+                                     dimnames = NULL)
+}
+
+do.call(rbind, df.list) # rbind list elements
 
