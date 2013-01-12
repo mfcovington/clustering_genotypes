@@ -91,7 +91,7 @@ CorPlot <- function(cor.mat, cor.colors = c("red", "white", "blue"), star.color 
       geom_text(aes(label = p.sig), color = star.color) +
       theme(axis.text.x = element_text(angle = 270, hjust = 0)) +
       scale_fill_gradientn(
-        colors = cor.colors,
+        colours = cor.colors,
         limits  = c(-1, 1)) +
       scale_x_discrete(limits = sample.order[1:length(sample.order) - 1]) +
       scale_y_discrete(limits = sample.order[length(sample.order):2]) +
