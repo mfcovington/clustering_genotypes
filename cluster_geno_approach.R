@@ -64,7 +64,7 @@ CalcScore <- function(sample.df) {
     return(sample.df)
 }
 
-CorPlot <- function(cor.mat, cor.colors = c("red", "white", "blue")) {
+CorPlot <- function(cor.mat, cor.colors = c("red", "white", "blue"), star.color = "green") {
     # function to plot correlation matrix
     # adapted from: http://theatavism.blogspot.com/2009/05/plotting-correlation-matrix-with.html
     #
@@ -88,7 +88,7 @@ CorPlot <- function(cor.mat, cor.colors = c("red", "white", "blue")) {
 
     cor.plot <- ggplot(cor.df, aes(id.a, id.b, fill = cor.val)) +
       geom_tile() +
-      geom_text(aes(label = p.sig), color = "green") +
+      geom_text(aes(label = p.sig), color = star.color) +
       theme(axis.text.x = element_text(angle = 270, hjust = 0)) +
       scale_fill_gradientn(
         colors = cor.colors,
