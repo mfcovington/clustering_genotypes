@@ -59,6 +59,7 @@ CorPlot <- function(cor.mat) {
     # adapted from: http://theatavism.blogspot.com/2009/05/plotting-correlation-matrix-with.html
 
     require("ggplot2")
+    require("reshape")
     cor.pval <- CorPval(cor.mat)
     stars <- as.character(
         symnum(
