@@ -50,13 +50,7 @@ GenoCor <- function(files) {
     return(genocor.mat)
 }
 
-files <- list.files(pattern = "\\.genotyped\\.nr$")
-genocor.mat <- GenoCor(files)
-genocor.df <- melt(genocor.mat)
-
-library("ggplot2")
-
-cor.pval <- function(x, alternative="two-sided", ...) {
+CorPval <- function(x, alternative="two-sided", ...) {
 
     # from: http://tolstoy.newcastle.edu.au/R/help/05/04/2659.html
     corMat <- cor(x, ...)
@@ -74,34 +68,41 @@ cor.pval <- function(x, alternative="two-sided", ...) {
     p
 }
 
+CorPlot <- function(cor.mat) {
 
-genocor.pval <- cor.pval(genocor.mat)
-stars <- as.character(
-    symnum(genocor.pval,
-        cutpoints = c( 0,      0.001,   0.01,    0.05,  1),
-        symbols   = c(   '***',    '**',     '*',     '' ), legend = FALSE))
+    # adapted from: http://theatavism.blogspot.com/2009/05/plotting-correlation-matrix-with.html
+    library("ggplot2")
+    cor.pval <- CorPval(cor.mat)
+    stars <- as.character(
+        symnum(
+            cor.pval,
+            cutpoints = c( 0,     0.001,    0.01,   0.05,  1),
+            symbols   = c(   '***',     '**',    '*',    '' ), legend = FALSE))
 
-genocor.df <- cbind(melt(genocor.mat), stars)
-names(genocor.df) <- c("id.a", "id.b", "cor.val", "p.sig")
+    cor.df <- cbind(melt(cor.mat), stars)
+    names(cor.df) <- c("id.a", "id.b", "cor.val", "p.sig")
+    sample.order <- as.character(unique(cor.df$id.b))
 
-self <- subset(genocor.df, id.a == id.b)
-lower <- subset(genocor.df[lower.tri(genocor.mat),], id.a != id.b)
-upper <- subset(genocor.df[upper.tri(genocor.mat),], id.a != id.b)
-genocor.plot <- ggplot(genocor.df, aes(id.a, id.b, fill = cor.val))
-genocor.plot + geom_tile()
+    cor.df <- subset(cor.df[upper.tri(cor.mat), ], id.a != id.b)
 
-sample.order <- as.character(unique(genocor.df$id.b))
+    cor.plot <- ggplot(cor.df, aes(id.a, id.b, fill = cor.val)) +
+      geom_tile() +
+      geom_text(aes(label = p.sig), color = "green") +
+      theme(axis.text.x = element_text(angle = 270, hjust = 0)) +
+      scale_fill_gradientn(
+        colours = c("red", "white", "blue"),
+        limits  = c(-1, 1)) +
+      scale_x_discrete(limits = sample.order[1:length(sample.order) - 1]) +
+      scale_y_discrete(limits = sample.order[length(sample.order):2]) +
+      labs(x = '', y = '')
+}
 
-genocor.plot <- ggplot(upper, aes(id.a, id.b, fill = cor.val))
-genocor.plot +
-  geom_tile() +
-  geom_text(aes(label=p.sig), color = "green") +
-  # geom_text(aes(label=X2)) +
-  # scale_colour_identity() +
-  theme(axis.text.x = element_text(angle = 270, hjust = 0)) +
-  scale_fill_gradientn(colours= c("red", "white", "blue"), limits=c(-1,1)) +
-  scale_x_discrete(limits=sample.order[1:length(sample.order) - 1]) +
-  scale_y_discrete(limits=sample.order[length(sample.order):2]) +
-  labs(x = '', y = '')
+
+files <- list.files(pattern = "\\.genotyped\\.nr$")
+genocor.mat <- GenoCor(files)
+CorPlot(genocor.mat)
+
+
+
 
 
