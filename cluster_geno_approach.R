@@ -82,6 +82,7 @@ CorPlot <- function(cor.mat) {
       scale_x_discrete(limits = sample.order[1:length(sample.order) - 1]) +
       scale_y_discrete(limits = sample.order[length(sample.order):2]) +
       labs(x = '', y = '')
+    cor.plot
 }
 
 CorPval <- function(x, alternative="two-sided", ...) {
