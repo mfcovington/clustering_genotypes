@@ -22,10 +22,20 @@ CalcScore <- function(sample.df) {
 }
 
 GenoCor <- function(files) {
+
+    # filter out empty files
     files <- files[file.info(files)$size > 0]
+
+    # extract sample ids from input files
     ids <- unique(gsub(pattern = "(.*)\\.[^.]+\\.genotyped.*", replacement = "\\1", files))
 
+    # initiate data frame w/ merge-by columns
     merged <- data.frame(chr = NA, pos = NA)
+
+    # read in all files for each sample,
+    # calculate genotype scores, and
+    # merge resulting scores
+    # (columns are named after sample id)
     for (id in ids) {
         print(id)
         data <- ReadMultiTables(c(list.files(pattern = id)))
@@ -34,7 +44,9 @@ GenoCor <- function(files) {
         colnames(merged)[ncol(merged)] <- id
     }
 
+    # generate correlation matrix
     genocor.mat <- cor(merged[, 3:ncol(merged)], use = "pairwise.complete.obs")
+
     return(genocor.mat)
 }
 
