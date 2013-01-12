@@ -1,6 +1,10 @@
 GenoCor <- function(files) {
     # function to generate a correlation matrix for
     # genotype data from multiple samples
+    #
+    # requires functions:
+    # - ReadMultiTables
+    # - CalcScore
 
     # filter out empty files
     files <- files[file.info(files)$size > 0]
@@ -32,6 +36,9 @@ GenoCor <- function(files) {
 ReadMultiTables <- function(file.names, ...) {
     # function to read multiple files at once
     # adapted from: http://stackoverflow.com/questions/2104483/how-to-read-table-multiple-files-into-a-single-table-in-r/2104532#2104532
+    #
+    # called by function:
+    # - GenoCor
 
     require(plyr)
     ldply(file.names, function(fn) data.frame(Filename=fn, read.table(fn, ...)))
@@ -42,6 +49,9 @@ CalcScore <- function(sample.df) {
     # par1 ==  1
     # het  ==  0
     # par2 == -1
+    #
+    # called by function:
+    # - GenoCor
 
     colnames(sample.df) <- c("filename", "chr", "pos", "par1", "par2", "tot")
     sample.df <- cbind(sample.df, (sample.df$par2 - sample.df$par1) / sample.df$tot)
@@ -57,6 +67,9 @@ CalcScore <- function(sample.df) {
 CorPlot <- function(cor.mat) {
     # function to plot correlation matrix
     # adapted from: http://theatavism.blogspot.com/2009/05/plotting-correlation-matrix-with.html
+    #
+    # requires function:
+    # - CorPval
 
     require("ggplot2")
     require("reshape")
@@ -89,6 +102,9 @@ CorPlot <- function(cor.mat) {
 CorPval <- function(x, alternative="two-sided", ...) {
     # function to calculate p-values from correlation matrix
     # from: http://tolstoy.newcastle.edu.au/R/help/05/04/2659.html
+    #
+    # called by function:
+    # - CorPlot
 
     corMat <- cor(x, ...)
     n <- nrow(x)
