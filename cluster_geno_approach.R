@@ -64,7 +64,12 @@ CalcScore <- function(sample.df) {
     return(sample.df)
 }
 
-CorPlot <- function(cor.mat, cor.colors = c("red", "white", "blue"), star.color = "green") {
+CorPlot <- function(cor.mat,
+                    cor.colors = c("red", "white", "blue"),
+                    star.color = "green",
+                    plot       = TRUE,
+                    save       = FALSE,
+                    filename   = "corplot.png") {
     # function to plot correlation matrix
     # adapted from: http://theatavism.blogspot.com/2009/05/plotting-correlation-matrix-with.html
     #
@@ -96,7 +101,8 @@ CorPlot <- function(cor.mat, cor.colors = c("red", "white", "blue"), star.color 
       scale_x_discrete(limits = sample.order[1:length(sample.order) - 1]) +
       scale_y_discrete(limits = sample.order[length(sample.order):2]) +
       labs(x = '', y = '')
-    cor.plot
+    if (plot == TRUE) return(cor.plot)
+    if (save == TRUE) ggsave(cor.plot, filename = filename)
 }
 
 CorPval <- function(x, alternative="two-sided", ...) {
@@ -124,7 +130,7 @@ CorPval <- function(x, alternative="two-sided", ...) {
 setwd("/Users/mfc/git.repos/clustering_genotypes/samples/genotyped/")
 files <- list.files(pattern = "\\.genotyped\\.nr$")
 genocor.mat <- GenoCor(files)
-CorPlot(genocor.mat)
+CorPlot(genocor.mat, plot = F, save = T, filename = "test.png")
 
 
 
