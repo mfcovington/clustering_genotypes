@@ -21,7 +21,7 @@ GenoCor <- function(files) {
     # (columns are named after sample id)
     for (id in ids) {
         print(id)
-        data <- ReadMultiTables(c(list.files(pattern = id)))
+        data <- ReadMultiTables(c(list.files(pattern = paste("^", id, "\\.", sep = ''))))
         data <- CalcScore(data)
         merged <- merge(merged, data[, c(2, 3, 8)], by = c("pos", "chr"), all = TRUE)
         colnames(merged)[ncol(merged)] <- id
