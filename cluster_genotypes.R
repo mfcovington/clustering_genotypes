@@ -1,4 +1,4 @@
-GenoCor <- function(files) {
+GenoCor <- function(files, verbose = TRUE) {
   # function to generate a correlation matrix for
   # genotype data from multiple samples
   #
@@ -22,7 +22,8 @@ GenoCor <- function(files) {
   # merge resulting scores
   # (columns are named after sample id)
   for (id in ids) {
-    print(id)
+    if (verbose == TRUE)
+      print(id)
     data <- ReadMultiTables(c(list.files(pattern = paste("^", id, "\\.", sep = ''))))
     data <- CalcScore(data)
     merged <- merge(x   = merged,
@@ -33,6 +34,8 @@ GenoCor <- function(files) {
   }
 
   # generate correlation matrix
+  if (verbose == TRUE)
+    print("Generating correlation matrix")
   genocor.mat <- cor(merged[, 3:ncol(merged)], use = "pairwise.complete.obs")
 
   return(genocor.mat)
